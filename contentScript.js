@@ -1,19 +1,55 @@
-function autoScrollReels() {
-  const videoElements = document.querySelectorAll("video");
+if (window.__fbReelsAutoScrollInitialized) {
+  console.debug("Auto Scroll Reels is already initialized on this page.");
+} else {
+  window.__fbReelsAutoScrollInitialized = true;
 
-  videoElements.forEach((video) => {
-    video.addEventListener("ended", () => {
-      // Scroll to the next reel when the video ends
-      var nextCard = document.querySelector('[aria-label="Next Card"]');
-      
-      console.log("Scrolled to next reel");
-      nextCard.click();
-      setTimeout(autoScrollReels, 2000);
-    });
+  const registeredVideos = new WeakSet();
+
+  function scrollToNextReel() {
+    const nextCard = document.querySelector('[aria-label="Next Card"]');
+
+    if (!nextCard) {
+      console.debug("Next reel button not found.");
+      return;
+    }
+
+    console.log("Scrolled to next reel");
+    nextCard.click();
+  }
+
+  function registerVideo(video) {
+    if (registeredVideos.has(video)) {
+      return;
+    }
+
+    registeredVideos.add(video);
+    video.addEventListener("ended", scrollToNextReel);
+  }
+
+  function registerVisibleVideos() {
+    const videoElements = document.querySelectorAll("video");
+    videoElements.forEach(registerVideo);
+  }
+
+  // Handle SPA updates where new reel elements are inserted without full reloads.
+  const observer = new MutationObserver(() => {
+    registerVisibleVideos();
   });
-}
 
-// Execute the function on page load
-window.addEventListener("load", () => {
-  setTimeout(autoScrollReels, 2000); // Wait 2 seconds to ensure elements are loaded
-});
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
+
+  if (document.readyState === "complete") {
+    setTimeout(registerVisibleVideos, 2000);
+  } else {
+    window.addEventListener(
+      "load",
+      () => {
+        setTimeout(registerVisibleVideos, 2000);
+      },
+      { once: true }
+    );
+  }
+}
