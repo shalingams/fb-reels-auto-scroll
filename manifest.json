@@ -1,17 +1,15 @@
 {
   "manifest_version": 3,
   "name": "Auto Scroll Facebook Reels",
-  "version": "1.0",
+  "version": "1.1.2",
   "description": "Automatically scroll through Facebook Reels when they finish playing.",
-  "permissions": [
-    "activeTab",
-    "scripting"
-  ],
   "action": {
     "default_popup": "popup.html"
   },
-  "background": {
-    "service_worker": "background.js"
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "fb-reels-auto-scroll@joelholder.com"
+    }
   },
   "content_scripts": [
     {

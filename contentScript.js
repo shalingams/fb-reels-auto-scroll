@@ -6,7 +6,16 @@ if (window.__fbReelsAutoScrollInitialized) {
   const registeredVideos = new WeakSet();
 
   function scrollToNextReel() {
-    const nextCard = document.querySelector('[aria-label="Next Card"]');
+    const selectors = [
+      '[aria-label="Next Card"]',
+      '[aria-label="Next"]',
+      '[aria-label="Next reel"]',
+      'div[role="button"][tabindex="0"][aria-label*="Next"]'
+    ];
+
+    const nextCard = selectors
+      .map((s) => document.querySelector(s))
+      .find(Boolean);
 
     if (!nextCard) {
       console.debug("Next reel button not found.");
